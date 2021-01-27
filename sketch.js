@@ -12,6 +12,51 @@ const color = {
   black: [0, 0, 0]
 };
 
+const mino = {
+  I: [
+    [0, 1],
+    [1, 1],
+    [2, 1],
+    [3, 1]
+  ],
+  O: [
+    [0, 0],
+    [0, 1],
+    [1, 0],
+    [1, 1]
+  ],
+  T: [
+    [0, 1],
+    [1, 0],
+    [1, 1],
+    [2, 1]
+  ],
+  L: [
+    [0, 1],
+    [1, 1],
+    [2, 0],
+    [2, 1]
+  ],
+  J: [
+    [0, 0],
+    [0, 1],
+    [1, 1],
+    [2, 1]
+  ],
+  S: [
+    [0, 1],
+    [1, 0],
+    [1, 1],
+    [2, 0]
+  ],
+  Z: [
+    [0, 0],
+    [1, 0],
+    [1, 1],
+    [2, 1]
+  ]
+};
+
 const row = [];
 for (let i = 0; i < 40; i++) {
   row[i] = 0;
@@ -27,12 +72,20 @@ function setup() {
 
 function draw() {
   background(color.white);
-  if (mouseIsPressed) {
-    fill(color.black);
-  } else {
-    fill(color.white);
+  for (let i in matrix) {
+    for (let j in matrix[i]) {
+      stroke(color.black);
+      fill(color.white);
+      strokeWeight(2);
+      rect(i * 30 - 150, j * 30 - windowHeight / 2 - 600, 30, 30);
+    }
   }
-  ellipse(mouseX - windowWidth / 2, mouseY - windowHeight / 2, 80, 80);
+  // if (mouseIsPressed) {
+  //   fill(color.black);
+  // } else {
+  //   fill(color.white);
+  // }
+  // ellipse(mouseX - windowWidth / 2, mouseY - windowHeight / 2, 80, 80);
 }
 
 function keyPressed() {
