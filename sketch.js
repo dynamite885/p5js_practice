@@ -57,15 +57,42 @@ const mino = {
   ]
 };
 
-const row = [];
-for (let i = 0; i < 40; i++) {
-  row[i] = 0;
-}
-const matrix = new Array(10);
-for (let i = 0; i < matrix.length; i++) {
-  matrix[i] = [...row];
+class Block {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+  draw() {
+    push();
+    rec;
+    pop();
+  }
 }
 
+class Mino {
+  constructor(x, y, shape) {
+    this.x = x;
+    this.y = y;
+    this.shape = shape;
+    this.rot = 0;
+  }
+}
+
+class Field {
+  constructor() {
+    let row = [];
+    for (let i = 0; i < 40; i++) {
+      row[i] = 0;
+    }
+    this.matrix = new Array(10);
+    for (let i = 0; i < this.matrix.length; i++) {
+      this.matrix[i] = [...row];
+    }
+  }
+}
+
+const F = new Field();
+const matrix = F.matrix;
 function setup() {
   createCanvas(windowWidth, windowHeight, WEBGL);
 }
