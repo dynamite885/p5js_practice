@@ -1,4 +1,6 @@
 /* eslint-disable no-undef, no-unused-vars */
+const cellSize = 30;
+
 const color = {
   white: [255, 255, 255],
   cyan: [0, 255, 255],
@@ -58,13 +60,22 @@ const mino = {
 };
 
 class Block {
-  constructor(x, y) {
+  constructor(x, y, c) {
     this.x = x;
     this.y = y;
+    this.c = c;
   }
   draw() {
     push();
-    rec;
+    stroke(color.black);
+    fill(Object.keys(color)[this.c]);
+    strokeWeight(1);
+    rect(
+      this.x * cellSize - 5 * cellSize,
+      this.y * cellSize - cellSize * 20 - windowHeight / 2,
+      cellSize,
+      cellSize
+    );
     pop();
   }
 }
@@ -80,33 +91,41 @@ class Mino {
 
 class Field {
   constructor() {
-    let row = [];
+    this.matrix = Array.from(Array(10), () => Array(40).fill(0));
+  }
+  draw() {
     for (let i = 0; i < 40; i++) {
-      row[i] = 0;
-    }
-    this.matrix = new Array(10);
-    for (let i = 0; i < this.matrix.length; i++) {
-      this.matrix[i] = [...row];
+      for (let j = 0; j < 10; j++) {
+        new Block(j, i, this.matrix[j][i]).draw();
+      }
     }
   }
 }
 
 const F = new Field();
 const matrix = F.matrix;
+
 function setup() {
   createCanvas(windowWidth, windowHeight, WEBGL);
 }
 
 function draw() {
-  background(color.white);
-  for (let i in matrix) {
-    for (let j in matrix[i]) {
-      stroke(color.black);
-      fill(color.white);
-      strokeWeight(2);
-      rect(i * 30 - 150, j * 30 - windowHeight / 2 - 600, 30, 30);
-    }
-  }
+  // background(color.white);
+  F.draw();
+  // for (let i in matrix) {
+  //   for (let j in matrix[i]) {
+  //     stroke(color.black);
+  //     fill(color.white);
+  //     strokeWeight(2);
+  //     rect(
+  //       i * cellSize - 5 * cellSize,
+  //       j * cellSize - cellSize * 20 - windowHeight / 2,
+  //       cellSize,
+  //       cellSize
+  //     );
+  //   }
+  // }
+
   // if (mouseIsPressed) {
   //   fill(color.black);
   // } else {
