@@ -68,7 +68,7 @@ class Block {
   draw() {
     push();
     stroke(color.black);
-    fill(Object.keys(color)[this.c]);
+    fill(Object.values(color)[this.c]);
     strokeWeight(1);
     rect(
       this.x * cellSize - 5 * cellSize,
@@ -86,6 +86,12 @@ class Mino {
     this.y = y;
     this.shape = shape;
     this.rot = 0;
+  }
+  draw() {
+    Object.values(mino)[this.shape].map((m) => {
+      new Block(m[0] + this.x, m[1] + this.y, this.shape + 1).draw();
+      return 0;
+    });
   }
 }
 
@@ -111,7 +117,7 @@ function setup() {
 
 function draw() {
   // background(color.white);
-  F.draw();
+  // F.draw();
   // for (let i in matrix) {
   //   for (let j in matrix[i]) {
   //     stroke(color.black);
@@ -125,7 +131,6 @@ function draw() {
   //     );
   //   }
   // }
-
   // if (mouseIsPressed) {
   //   fill(color.black);
   // } else {
