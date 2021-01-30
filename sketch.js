@@ -59,6 +59,25 @@ const mino = {
   ]
 };
 
+const rotationMatrix = [
+  [
+    [1, 0],
+    [0, 1]
+  ],
+  [
+    [0, -1],
+    [1, 0]
+  ],
+  [
+    [-1, 0],
+    [0, -1]
+  ],
+  [
+    [0, 1],
+    [-1, 0]
+  ]
+];
+
 class Block {
   constructor(x, y, c) {
     this.x = x;
@@ -87,8 +106,21 @@ class Mino {
     this.shape = shape;
     this.rot = 0;
   }
+  reshape() {
+    let r = rotationMatrix[this.rot];
+    let s = Object.values(mino)[this.shape].map((m) => {
+      let x = m[0] * r[0][0] + m[1] * r[0][1];
+      let y = m[0] * r[1][0] + m[1] * r[1][1];
+      return [x - Math.min(...r[0]) * 2, y - Math.min(...r[1]) * 2];
+    });
+    return s;
+  }
+  rotate(r) {
+    this.rot = (this.rot + r + 4) % 4;
+  }
   draw() {
-    Object.values(mino)[this.shape].map((m) => {
+    let a = this.reshape();
+    a.map((m) => {
       new Block(m[0] + this.x, m[1] + this.y, this.shape + 1).draw();
       return 0;
     });
