@@ -78,6 +78,99 @@ const rotationMatrix = [
   ]
 ];
 
+const SRS = [
+  [
+    [
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0]
+    ],
+    [
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0]
+    ],
+    [
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0]
+    ],
+    [
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0]
+    ]
+  ],
+  [
+    [
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0]
+    ],
+    [
+      [0, 0],
+      [1, 0],
+      [1, 1],
+      [0, -2],
+      [1, -2]
+    ],
+    [
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0]
+    ],
+    [
+      [0, 0],
+      [-1, 0],
+      [-1, 1],
+      [0, -2],
+      [-1, -2]
+    ]
+  ],
+  [
+    [
+      [0, 0],
+      [-1, 0],
+      [2, 0],
+      [-1, 0],
+      [2, 0]
+    ],
+    [
+      [0, 0],
+      [1, 0],
+      [1, 0],
+      [1, -1],
+      [1, 2]
+    ],
+    [
+      [0, 0],
+      [2, 0],
+      [-1, 0],
+      [2, 1],
+      [-1, 1]
+    ],
+    [
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 2],
+      [0, -1]
+    ]
+  ]
+];
+
 class Block {
   constructor(x, y, c) {
     this.x = x;
@@ -91,7 +184,7 @@ class Block {
     strokeWeight(1);
     rect(
       this.x * cellSize - 5 * cellSize,
-      this.y * cellSize - cellSize * 20 - windowHeight / 2,
+      this.y * cellSize - cellSize * 19.5 - windowHeight / 2,
       cellSize,
       cellSize
     );
@@ -117,6 +210,10 @@ class Mino {
   }
   rotate(r) {
     this.rot = (this.rot + r + 4) % 4;
+  }
+  move(x, y) {
+    this.x += x;
+    this.y += y;
   }
   draw() {
     let a = this.reshape();
@@ -146,10 +243,11 @@ const matrix = F.matrix;
 function setup() {
   createCanvas(windowWidth, windowHeight, WEBGL);
 }
-
+const nMino = new Mino(3, 19, 2);
 function draw() {
-  // background(color.white);
-  // F.draw();
+  background(color.white);
+  F.draw();
+  nMino.draw();
   // for (let i in matrix) {
   //   for (let j in matrix[i]) {
   //     stroke(color.black);
@@ -172,16 +270,25 @@ function draw() {
 }
 
 function keyPressed() {
+  if (keyCode === 82) {
+  } //r
   if (keyCode === UP_ARROW) {
+    nMino.rotate(1);
   }
   if (keyCode === DOWN_ARROW) {
+    nMino.move(0, 1);
   }
   if (keyCode === LEFT_ARROW) {
+    nMino.move(-1, 0);
   }
   if (keyCode === RIGHT_ARROW) {
+    nMino.move(1, 0);
   }
   if (keyCode === 32) {
-  }
+  } //space
+  if (keyCode === 90) {
+    nMino.rotate(-1);
+  } //z
   return false;
 }
 
