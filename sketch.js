@@ -199,6 +199,9 @@ class Mino {
     this.shape = shape;
     this.rot = 0;
   }
+  isBlocked(x = 0, y = 0, d = 0) {
+    return true;
+  }
   reshape() {
     let r = rotationMatrix[this.rot];
     let s = Object.values(mino)[this.shape].map((m) => {
@@ -208,8 +211,8 @@ class Mino {
     });
     return s;
   }
-  rotate(r) {
-    this.rot = (this.rot + r + 4) % 4;
+  rotate(d) {
+    this.rot = (this.rot + d + 4) % 4;
   }
   move(x, y) {
     this.x += x;
@@ -228,6 +231,13 @@ class Field {
   constructor() {
     this.matrix = Array.from(Array(10), () => Array(40).fill(0));
   }
+  setBlock(x, y, c) {
+    this.matrix[x][y] = c;
+  }
+  clearLine(y) {
+    this.matrix.splice(y, 1);
+    this.matrix.unshift([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  }
   draw() {
     for (let i = 0; i < 40; i++) {
       for (let j = 0; j < 10; j++) {
@@ -243,30 +253,11 @@ const matrix = F.matrix;
 function setup() {
   createCanvas(windowWidth, windowHeight, WEBGL);
 }
-const nMino = new Mino(3, 19, 2);
+const nMino = new Mino(3, 19, 3);
 function draw() {
   background(color.white);
   F.draw();
   nMino.draw();
-  // for (let i in matrix) {
-  //   for (let j in matrix[i]) {
-  //     stroke(color.black);
-  //     fill(color.white);
-  //     strokeWeight(2);
-  //     rect(
-  //       i * cellSize - 5 * cellSize,
-  //       j * cellSize - cellSize * 20 - windowHeight / 2,
-  //       cellSize,
-  //       cellSize
-  //     );
-  //   }
-  // }
-  // if (mouseIsPressed) {
-  //   fill(color.black);
-  // } else {
-  //   fill(color.white);
-  // }
-  // ellipse(mouseX - windowWidth / 2, mouseY - windowHeight / 2, 80, 80);
 }
 
 function keyPressed() {
