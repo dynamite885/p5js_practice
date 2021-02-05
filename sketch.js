@@ -200,7 +200,19 @@ class Mino {
     this.rot = 0;
   }
   isBlocked(x = 0, y = 0, d = 0) {
-    return true;
+    let s = Object.values(mino)[this.shape].map((m) => {
+      x += m[0] * r[0][0] + m[1] * r[0][1];
+      y += m[0] * r[1][0] + m[1] * r[1][1];
+      return [x - Math.min(...r[0]) * 2, y - Math.min(...r[1]) * 2];
+    });
+    s = s.map((m) => {
+      if (m[0] < 0 || m[0] >= 10 || m[1] < 0 || m[1] >= 40) {
+        return false;
+      } else {
+        return true;
+      }
+    });
+    return s;
   }
   reshape() {
     let r = rotationMatrix[this.rot];
