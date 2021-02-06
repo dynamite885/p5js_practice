@@ -199,21 +199,6 @@ class Mino {
     this.shape = shape;
     this.rot = 0;
   }
-  isBlocked(x = 0, y = 0, d = 0) {
-    let s = Object.values(mino)[this.shape].map((m) => {
-      x += m[0] * r[0][0] + m[1] * r[0][1];
-      y += m[0] * r[1][0] + m[1] * r[1][1];
-      return [x - Math.min(...r[0]) * 2, y - Math.min(...r[1]) * 2];
-    });
-    s = s.map((m) => {
-      if (m[0] < 0 || m[0] >= 10 || m[1] < 0 || m[1] >= 40) {
-        return false;
-      } else {
-        return true;
-      }
-    });
-    return s;
-  }
   reshape() {
     let r = rotationMatrix[this.rot];
     let s = Object.values(mino)[this.shape].map((m) => {
@@ -246,6 +231,9 @@ class Field {
   setBlock(x, y, c) {
     this.matrix[x][y] = c;
   }
+  getBlock(x, y) {
+    return this.matrix[x][y];
+  }
   clearLine(y) {
     this.matrix.splice(y, 1);
     this.matrix.unshift([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
@@ -259,38 +247,64 @@ class Field {
   }
 }
 
+class Game {
+  constructor() {
+    this.bag = this.randomGenerator();
+    this.mino = this.spawnMino();
+    this.nexts = [];
+    this.field = new Field();
+  }
+  spawnMino() {
+    let b = this.bag.pop();
+    let x = 3;
+    if (b === 1) {
+      x = 4;
+    }
+    return new Mino(x, 19, b);
+  }
+  randomGenerator() {
+    let minos = [0, 1, 2, 3, 4, 5, 6]; //Object.keys(mino).slice();
+    let bag = [];
+    for (let i = 0; i < Object.keys(mino).length; i++) {
+      bag.push(...minos.splice(Math.floor(random(0, minos.length)), 1));
+    }
+    return bag;
+  }
+  proc() {}
+}
+
 const F = new Field();
 const matrix = F.matrix;
 
 function setup() {
   createCanvas(windowWidth, windowHeight, WEBGL);
+  game = new Game();
 }
-const nMino = new Mino(3, 19, 3);
 function draw() {
   background(color.white);
   F.draw();
-  nMino.draw();
+  game.mino.draw();
 }
 
 function keyPressed() {
   if (keyCode === 82) {
   } //r
   if (keyCode === UP_ARROW) {
-    nMino.rotate(1);
+    game.mino.rotate(1);
   }
   if (keyCode === DOWN_ARROW) {
-    nMino.move(0, 1);
+    game.mino.move(0, 1);
   }
   if (keyCode === LEFT_ARROW) {
-    nMino.move(-1, 0);
+    game.mino.move(-1, 0);
   }
   if (keyCode === RIGHT_ARROW) {
-    nMino.move(1, 0);
+    game.mino.move(1, 0);
   }
   if (keyCode === 32) {
   } //space
   if (keyCode === 90) {
-    nMino.rotate(-1);
+    game.mino.rotate(-1);
   } //z
   return false;
 }
