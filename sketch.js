@@ -57,7 +57,7 @@ const mino = {
     [1, 1],
     [2, 1]
   ]
-};
+}; // 미노 기본 데이터 IOTLJSZ순
 
 const rotationMatrix = [
   [
@@ -76,7 +76,7 @@ const rotationMatrix = [
     [0, 1],
     [-1, 0]
   ]
-];
+]; // 0도, 90도, 180도, 270도 회전시 행렬곱에 사용되는 회전행렬 데이터
 
 const SRS = [
   [
@@ -169,7 +169,7 @@ const SRS = [
       [0, -1]
     ]
   ]
-];
+]; // Super Rotation System 데이터
 
 class Block {
   constructor(x, y, c) {
@@ -199,15 +199,19 @@ class Mino {
     this.shape = shape;
     this.rot = 0;
   }
-  reshape() {
+  getShape() {
     let r = rotationMatrix[this.rot];
     let s = Object.values(mino)[this.shape].map((m) => {
       let x = m[0] * r[0][0] + m[1] * r[0][1];
       let y = m[0] * r[1][0] + m[1] * r[1][1];
-      return [x - Math.min(...r[0]) * 2, y - Math.min(...r[1]) * 2];
+      return [
+        x - Math.min(...r[0]) * 2 + this.x,
+        y - Math.min(...r[1]) * 2 + this.y
+      ];
     });
     return s;
-  }
+  } //회전한 만큼 변한 모습을 절대좌표로 반환
+  setSRS(f, m) {} // SRS 적용 함수 f=필드 객체, m=계산용 미노 객체
   rotate(d) {
     this.rot = (this.rot + d + 4) % 4;
   }
@@ -216,9 +220,9 @@ class Mino {
     this.y += y;
   }
   draw() {
-    let a = this.reshape();
-    a.map((m) => {
-      new Block(m[0] + this.x, m[1] + this.y, this.shape + 1).draw();
+    let shapeData = this.getShape();
+    shapeData.map((m) => {
+      new Block(m[0], m[1], this.shape + 1).draw();
       return 0;
     });
   }
@@ -237,7 +241,7 @@ class Field {
   clearLine(y) {
     this.matrix.splice(y, 1);
     this.matrix.unshift([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-  }
+  } // y행 라인클리어
   draw() {
     for (let i = 0; i < 40; i++) {
       for (let j = 0; j < 10; j++) {
@@ -249,18 +253,27 @@ class Field {
 
 class Game {
   constructor() {
-    this.bag = this.randomGenerator();
+    this.nexts = this.randomGenerator();
     this.mino = this.spawnMino();
-    this.nexts = [];
     this.field = new Field();
+    this.hold = null;
   }
   spawnMino() {
-    let b = this.bag.pop();
+    let b = this.nexts.shift();
     let x = 3;
     if (b === 1) {
       x = 4;
     }
     return new Mino(x, 19, b);
+  }
+  fillNexts() {
+    if (this.nexts.length < 7) {
+      let nexts = this.randomGenerator();
+      return nexts;
+    }
+  }
+  getNexts(n = 5) {
+    //넥스트 그릴 때 this.nexts로부터 앞에서 n 개의 배열을 반환. 디폴트 = 5
   }
   randomGenerator() {
     let minos = [0, 1, 2, 3, 4, 5, 6]; //Object.keys(mino).slice();
@@ -270,20 +283,21 @@ class Game {
     }
     return bag;
   }
-  proc() {}
-}
+  proc() {
+    this.fillNexts();
 
-const F = new Field();
-const matrix = F.matrix;
+    background(color.white);
+    this.field.draw();
+    this.mino.draw();
+  }
+}
 
 function setup() {
   createCanvas(windowWidth, windowHeight, WEBGL);
   game = new Game();
 }
 function draw() {
-  background(color.white);
-  F.draw();
-  game.mino.draw();
+  game.proc();
 }
 
 function keyPressed() {
