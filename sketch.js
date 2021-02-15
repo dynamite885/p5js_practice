@@ -310,6 +310,11 @@ class Game {
       this.fixMino = false;
     }
     if (this.move !== 0) {
+      // let b = this.mino.getBlocks();
+      // b.map((m) => {
+      //   this.field.isInField(...m);
+      //   return 0;
+      // });
       this.mino.move(this.move, 0);
       this.move = 0;
     }
