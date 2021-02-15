@@ -262,7 +262,9 @@ class Game {
     this.mino = this.spawnMino();
     this.field = new Field();
     this.hold = null;
-    this.setMino = false;
+    this.fixMino = false;
+    this.move = 0;
+    this.rotate = 0;
   }
   spawnMino() {
     let b = this.nexts.shift();
@@ -300,12 +302,20 @@ class Game {
     return true;
   }
   proc() {
-    if (this.setMino) {
+    if (this.fixMino) {
       this.mino.getBlocks().map((m) => {
         this.field.setBlock(m[0], m[1], this.mino.shape + 1);
         return 0;
       });
-      this.setMino = false;
+      this.fixMino = false;
+    }
+    if (this.move !== 0) {
+      this.mino.move(this.move, 0);
+      this.move = 0;
+    }
+    if (this.rotate !== 0) {
+      this.mino.rotate(this.rotate);
+      this.rotate = 0;
     }
     this.fillNexts();
 
@@ -327,22 +337,22 @@ function keyPressed() {
   if (keyCode === 82) {
   } //r
   if (keyCode === UP_ARROW) {
-    game.mino.rotate(1);
+    game.rotate = 1;
   }
   if (keyCode === DOWN_ARROW) {
     game.mino.move(0, 1);
   }
   if (keyCode === LEFT_ARROW) {
-    game.mino.move(-1, 0);
+    game.move = -1;
   }
   if (keyCode === RIGHT_ARROW) {
-    game.mino.move(1, 0);
+    game.move = 1;
   }
   if (keyCode === 32) {
-    game.setMino = true;
+    game.fixMino = true;
   } //space
   if (keyCode === 90) {
-    game.mino.rotate(-1);
+    game.rotate = -1;
   } //z
   return false;
 }
