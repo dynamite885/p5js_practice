@@ -199,7 +199,7 @@ class Mino {
     this.shape = shape;
     this.rot = 0;
   }
-  getShape() {
+  getBlocks() {
     let r = rotationMatrix[this.rot];
     let s = Object.values(mino)[this.shape].map((m) => {
       let x = m[0] * r[0][0] + m[1] * r[0][1];
@@ -220,8 +220,8 @@ class Mino {
     this.y += y;
   }
   draw() {
-    let shapeData = this.getShape();
-    shapeData.map((m) => {
+    let blocks = this.getBlocks();
+    blocks.map((m) => {
       new Block(m[0], m[1], this.shape + 1).draw();
       return 0;
     });
@@ -237,6 +237,11 @@ class Field {
   }
   getBlock(x, y) {
     return this.matrix[x][y];
+  }
+  isInField(x, y) {
+    if (x >= 0 && x < 10 && y >= 0 && y < 40) {
+      return true;
+    }
   }
   clearLine(y) {
     this.matrix.splice(y, 1);
@@ -257,6 +262,7 @@ class Game {
     this.mino = this.spawnMino();
     this.field = new Field();
     this.hold = null;
+    this.setMino = false;
   }
   spawnMino() {
     let b = this.nexts.shift();
@@ -283,7 +289,24 @@ class Game {
     }
     return bag;
   }
+  isMovable(m, f) {
+    let blocks = m.getBlocks();
+    return blocks.every((b) => {
+      f.isInField(b.x, b.y);
+      return 0;
+    });
+  }
+  isRotatable(m, f) {
+    return true;
+  }
   proc() {
+    if (this.setMino) {
+      this.mino.getBlocks().map((m) => {
+        this.field.setBlock(m[0], m[1], this.mino.shape + 1);
+        return 0;
+      });
+      this.setMino = false;
+    }
     this.fillNexts();
 
     background(color.white);
@@ -316,6 +339,7 @@ function keyPressed() {
     game.mino.move(1, 0);
   }
   if (keyCode === 32) {
+    game.setMino = true;
   } //space
   if (keyCode === 90) {
     game.mino.rotate(-1);
