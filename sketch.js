@@ -193,11 +193,11 @@ class Block {
 }
 
 class Mino {
-  constructor(x, y, shape) {
+  constructor(x, y, shape, rot = 0) {
     this.x = x;
     this.y = y;
     this.shape = shape;
-    this.rot = 0;
+    this.rot = rot;
   }
   getBlocks() {
     let r = rotationMatrix[this.rot];
@@ -242,6 +242,7 @@ class Field {
     if (x >= 0 && x < 10 && y >= 0 && y < 40) {
       return true;
     }
+    return false;
   }
   clearLine(y) {
     this.matrix.splice(y, 1);
@@ -293,13 +294,16 @@ class Game {
   }
   isMovable(m, f) {
     let blocks = m.getBlocks();
-    return blocks.every((b) => {
-      f.isInField(b.x, b.y);
-      return 0;
-    });
+    let inField = blocks.every((b) => {
+      return f.isInField(b[0], b[1]);
+    }); //블록에 막히는 조건 추가할 것
+    return inField;
   }
   isRotatable(m, f) {
     return true;
+  }
+  cloneMino(x, y, s, r) {
+    return new Mino(x, y, s, r);
   }
   proc() {
     if (this.fixMino) {
@@ -310,12 +314,11 @@ class Game {
       this.fixMino = false;
     }
     if (this.move !== 0) {
-      // let b = this.mino.getBlocks();
-      // b.map((m) => {
-      //   this.field.isInField(...m);
-      //   return 0;
-      // });
-      this.mino.move(this.move, 0);
+      let b = this.cloneMino(...Object.values(this.mino));
+      b.move(this.move, 0);
+      if (this.isMovable(b, this.field)) {
+        this.mino.move(this.move, 0);
+      }
       this.move = 0;
     }
     if (this.rotate !== 0) {
