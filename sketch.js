@@ -88,21 +88,21 @@ const SRS = [
       [0, 0]
     ],
     [
-      [0, 0],
-      [0, 0],
-      [0, 0],
-      [0, 0],
-      [0, 0]
-    ],
-    [
-      [0, 0],
+      [1, 0],
       [0, 0],
       [0, 0],
       [0, 0],
       [0, 0]
     ],
     [
+      [1, 1],
       [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0]
+    ],
+    [
+      [0, 1],
       [0, 0],
       [0, 0],
       [0, 0],
@@ -148,25 +148,25 @@ const SRS = [
       [2, 0]
     ],
     [
-      [0, 0],
-      [1, 0],
-      [1, 0],
-      [1, -1],
-      [1, 2]
-    ],
-    [
-      [0, 0],
-      [2, 0],
       [-1, 0],
-      [2, 1],
-      [-1, 1]
+      [0, 0],
+      [0, 0],
+      [0, -1],
+      [0, 2]
     ],
     [
-      [0, 0],
-      [0, 0],
-      [0, 0],
-      [0, 2],
-      [0, -1]
+      [-1, -1],
+      [1, -1],
+      [-2, -1],
+      [1, 0],
+      [-2, 0]
+    ],
+    [
+      [0, -1],
+      [0, -1],
+      [0, -1],
+      [0, 1],
+      [0, -2]
     ]
   ]
 ]; // Super Rotation System 데이터
@@ -211,7 +211,14 @@ class Mino {
     });
     return s;
   } //회전한 만큼 변한 모습을 절대좌표로 반환
-  setSRS(f, m) {} // SRS 적용 함수 f=필드 객체, m=계산용 미노 객체
+  setSRS(n, r) {
+    let s = Math.max(...Object.values(mino)[this.shape][3]) - 1;
+    this.x += SRS[s][r][n][0] - SRS[s][this.rot][n][0];
+    this.y += SRS[s][r][n][1] - SRS[s][this.rot][n][1];
+    // this.move(
+    //   ...SRS[Math.max(...Object.values(mino)[this.shape][3]) - 1][this.rot]
+    // );
+  } // SRS 적용 함수 n=시도 횟수, r=회전방향
   rotate(d) {
     this.rot = (this.rot + d + 4) % 4;
   }
@@ -223,6 +230,13 @@ class Mino {
     let blocks = this.getBlocks();
     blocks.map((m) => {
       new Block(m[0], m[1], this.shape + 1).draw();
+      return 0;
+    });
+  }
+  colorlessDraw() {
+    let blocks = this.getBlocks();
+    blocks.map((m) => {
+      new Block(m[0], m[1], 8).draw();
       return 0;
     });
   }
@@ -261,6 +275,7 @@ class Game {
   constructor() {
     this.nexts = this.randomGenerator();
     this.mino = this.spawnMino();
+    this.ghost = null;
     this.field = new Field();
     this.hold = null;
     this.fixMino = false;
@@ -294,16 +309,23 @@ class Game {
   }
   isMovable(m, f) {
     let blocks = m.getBlocks();
-    let inField = blocks.every((b) => {
-      return f.isInField(b[0], b[1]);
-    }); //블록에 막히는 조건 추가할 것
-    return inField;
+    return blocks.every((b) => {
+      return f.isInField(b[0], b[1]) && f.getBlock(b[0], b[1]) === 0;
+    });
   }
   isRotatable(m, f) {
     return true;
   }
   cloneMino(x, y, s, r) {
     return new Mino(x, y, s, r);
+  }
+  drawGhost() {
+    this.ghost = this.cloneMino(...Object.values(this.mino));
+    while (this.isMovable(this.ghost, this.field)) {
+      this.ghost.move(0, 1);
+    }
+    this.ghost.move(0, -1);
+    this.ghost.colorlessDraw();
   }
   proc() {
     if (this.fixMino) {
@@ -322,13 +344,22 @@ class Game {
       this.move = 0;
     }
     if (this.rotate !== 0) {
-      this.mino.rotate(this.rotate);
+      let b = this.cloneMino(...Object.values(this.mino));
+      b.rotate(this.rotate);
+      for (let i = 0; i < 5; i++) {
+        b.setSRS(i, this.rot);
+        if (this.isMovable(b, this.field)) {
+          this.mino.rotate(this.rotate);
+          break;
+        }
+      }
       this.rotate = 0;
     }
     this.fillNexts();
 
     background(color.white);
     this.field.draw();
+    this.drawGhost();
     this.mino.draw();
   }
 }
