@@ -89,24 +89,24 @@ const SRS = [
     ],
     [
       [1, 0],
-      [0, 0],
-      [0, 0],
-      [0, 0],
-      [0, 0]
+      [1, 0],
+      [1, 0],
+      [1, 0],
+      [1, 0]
     ],
     [
       [1, 1],
-      [0, 0],
-      [0, 0],
-      [0, 0],
-      [0, 0]
+      [1, 1],
+      [1, 1],
+      [1, 1],
+      [1, 1]
     ],
     [
       [0, 1],
-      [0, 0],
-      [0, 0],
-      [0, 0],
-      [0, 0]
+      [0, 1],
+      [0, 1],
+      [0, 1],
+      [0, 1]
     ]
   ],
   [
@@ -212,9 +212,12 @@ class Mino {
     return s;
   } //회전한 만큼 변한 모습을 절대좌표로 반환
   setSRS(n, r) {
+    r = (this.rot - r + 4) % 4;
     let s = Math.max(...Object.values(mino)[this.shape][3]) - 1;
-    this.x += SRS[s][r][n][0] - SRS[s][this.rot][n][0];
-    this.y += SRS[s][r][n][1] - SRS[s][this.rot][n][1];
+    let toX = SRS[s][r][n][0] - SRS[s][this.rot][n][0];
+    let toY = SRS[s][r][n][1] - SRS[s][this.rot][n][1];
+    this.move(toX, toY);
+    return [toX, toY];
     // this.move(
     //   ...SRS[Math.max(...Object.values(mino)[this.shape][3]) - 1][this.rot]
     // );
@@ -347,11 +350,13 @@ class Game {
       let b = this.cloneMino(...Object.values(this.mino));
       b.rotate(this.rotate);
       for (let i = 0; i < 5; i++) {
-        b.setSRS(i, this.rot);
+        let pos = b.setSRS(i, this.rotate);
         if (this.isMovable(b, this.field)) {
           this.mino.rotate(this.rotate);
+          this.mino.move(...pos);
           break;
         }
+        b.move(-pos[0], -pos[1]);
       }
       this.rotate = 0;
     }
