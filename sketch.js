@@ -336,6 +336,7 @@ class Game {
         this.field.setBlock(m[0], m[1], this.mino.shape + 1);
         return 0;
       });
+      this.mino = this.spawnMino();
       this.fixMino = false;
     }
     if (this.move !== 0) {
