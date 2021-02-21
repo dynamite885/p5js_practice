@@ -256,9 +256,7 @@ class Field {
     return this.matrix[x][y];
   }
   isInField(x, y) {
-    if (x >= 0 && x < 10 && y >= 0 && y < 40) {
-      return true;
-    }
+    if (x >= 0 && x < 10 && y >= 0 && y < 40) return true;
     return false;
   }
   findFilledLines() {
@@ -268,9 +266,8 @@ class Field {
         this.matrix.every((a) => {
           return a[i] > 0;
         })
-      ) {
+      )
         l.push(i);
-      }
     }
     return l;
   }
@@ -299,6 +296,7 @@ class Game {
     this.ghost = null;
     this.field = new Field();
     this.hold = null;
+    this.isUsedHold = false;
     this.harddrop = false;
     this.move = [0, 0];
     this.rotate = 0;
@@ -306,9 +304,7 @@ class Game {
   spawnMino() {
     let b = this.nexts.shift();
     let x = 3;
-    if (b === 1) {
-      x = 4;
-    }
+    if (b === 1) x = 4;
     return new Mino(x, 19, b);
   }
   fillNexts() {
@@ -353,6 +349,27 @@ class Game {
       this.field.setBlock(m[0], m[1], this.mino.shape + 1);
       return 0;
     });
+    this.isUsedHold = false;
+  }
+  holdMino() {
+    if (this.isUsedHold === true) return 0;
+    if (this.hold === null) {
+      [this.hold, this.mino] = [this.mino, this.hold];
+      this.mino = this.spawnMino();
+      this.hold.x = -4;
+      this.hold.y = 21;
+    } else {
+      [this.hold.shape, this.mino.shape] = [this.mino.shape, this.hold.shape];
+    }
+    this.hold.rot = 0;
+    this.mino.rot = 0;
+    this.isUsedHold = true;
+  }
+  drawHold() {
+    if (this.hold !== null) {
+      if (this.isUsedHold === true) this.hold.colorlessDraw();
+      else this.hold.draw();
+    }
   }
   proc() {
     if (this.harddrop) {
@@ -364,9 +381,7 @@ class Game {
     if (this.move !== [0, 0]) {
       let b = this.cloneMino(...Object.values(this.mino));
       b.move(...this.move);
-      if (this.isMovable(b, this.field)) {
-        this.mino.move(...this.move);
-      }
+      if (this.isMovable(b, this.field)) this.mino.move(...this.move);
       this.move = [0, 0];
     }
     if (this.rotate !== 0) {
@@ -384,15 +399,14 @@ class Game {
       this.rotate = 0;
     }
     let filledLines = this.field.findFilledLines();
-    if (filledLines.length > 0) {
-      this.field.clearLines(filledLines);
-    }
+    if (filledLines.length > 0) this.field.clearLines(filledLines);
     this.fillNexts();
 
     background(color.white);
     this.field.draw();
     this.drawGhost();
     this.mino.draw();
+    this.drawHold();
   }
 }
 
@@ -425,6 +439,9 @@ function keyPressed() {
   if (keyCode === 90) {
     game.rotate = -1;
   } //z
+  if (keyCode === 16) {
+    game.holdMino();
+  }
   return false;
 }
 
