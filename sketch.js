@@ -261,9 +261,27 @@ class Field {
     }
     return false;
   }
-  clearLine(y) {
-    this.matrix.splice(y, 1);
-    this.matrix.unshift([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  findFilledLines() {
+    let l = [];
+    for (let i = 0; i < 40; i++) {
+      if (
+        this.matrix.every((a) => {
+          return a[i] > 0;
+        })
+      ) {
+        l.push(i);
+      }
+    }
+    return l;
+  }
+  clearLines(lines) {
+    for (let i = 0; i < lines.length; i++) {
+      this.matrix.map((m) => {
+        m.splice(lines[i], 1);
+        m.unshift(0);
+        return 0;
+      });
+    }
   } // y행 라인클리어
   draw() {
     for (let i = 0; i < 40; i++) {
@@ -281,8 +299,8 @@ class Game {
     this.ghost = null;
     this.field = new Field();
     this.hold = null;
-    this.fixMino = false;
-    this.move = 0;
+    this.harddrop = false;
+    this.move = [0, 0];
     this.rotate = 0;
   }
   spawnMino() {
@@ -296,7 +314,7 @@ class Game {
   fillNexts() {
     if (this.nexts.length < 7) {
       let nexts = this.randomGenerator();
-      return nexts;
+      this.nexts.push(...nexts);
     }
   }
   getNexts(n = 5) {
@@ -330,22 +348,26 @@ class Game {
     this.ghost.move(0, -1);
     this.ghost.colorlessDraw();
   }
+  fixMino() {
+    this.mino.getBlocks().map((m) => {
+      this.field.setBlock(m[0], m[1], this.mino.shape + 1);
+      return 0;
+    });
+  }
   proc() {
-    if (this.fixMino) {
-      this.mino.getBlocks().map((m) => {
-        this.field.setBlock(m[0], m[1], this.mino.shape + 1);
-        return 0;
-      });
+    if (this.harddrop) {
+      [this.mino.x, this.mino.y] = [this.ghost.x, this.ghost.y];
+      this.fixMino();
       this.mino = this.spawnMino();
-      this.fixMino = false;
+      this.harddrop = false;
     }
-    if (this.move !== 0) {
+    if (this.move !== [0, 0]) {
       let b = this.cloneMino(...Object.values(this.mino));
-      b.move(this.move, 0);
+      b.move(...this.move);
       if (this.isMovable(b, this.field)) {
-        this.mino.move(this.move, 0);
+        this.mino.move(...this.move);
       }
-      this.move = 0;
+      this.move = [0, 0];
     }
     if (this.rotate !== 0) {
       let b = this.cloneMino(...Object.values(this.mino));
@@ -360,6 +382,10 @@ class Game {
         b.move(-pos[0], -pos[1]);
       }
       this.rotate = 0;
+    }
+    let filledLines = this.field.findFilledLines();
+    if (filledLines.length > 0) {
+      this.field.clearLines(filledLines);
     }
     this.fillNexts();
 
@@ -385,16 +411,16 @@ function keyPressed() {
     game.rotate = 1;
   }
   if (keyCode === DOWN_ARROW) {
-    game.mino.move(0, 1);
+    game.move = [0, 1];
   }
   if (keyCode === LEFT_ARROW) {
-    game.move = -1;
+    game.move = [-1, 0];
   }
   if (keyCode === RIGHT_ARROW) {
-    game.move = 1;
+    game.move = [1, 0];
   }
   if (keyCode === 32) {
-    game.fixMino = true;
+    game.harddrop = true;
   } //space
   if (keyCode === 90) {
     game.rotate = -1;
