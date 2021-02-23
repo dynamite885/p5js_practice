@@ -1,6 +1,5 @@
 /* eslint-disable no-undef, no-unused-vars */
 const cellSize = 30;
-
 const color = {
   white: [255, 255, 255],
   cyan: [0, 255, 255],
@@ -13,7 +12,6 @@ const color = {
   gray: [100, 100, 100],
   black: [0, 0, 0]
 };
-
 const mino = {
   I: [
     [0, 1],
@@ -58,7 +56,6 @@ const mino = {
     [2, 1]
   ]
 }; // 미노 기본 데이터 IOTLJSZ순
-
 const rotationMatrix = [
   [
     [1, 0],
@@ -77,7 +74,6 @@ const rotationMatrix = [
     [-1, 0]
   ]
 ]; // 0도, 90도, 180도, 270도 회전시 행렬곱에 사용되는 회전행렬 데이터
-
 const SRS = [
   [
     [
@@ -170,7 +166,6 @@ const SRS = [
     ]
   ]
 ]; // Super Rotation System 데이터
-
 class Block {
   constructor(x, y, c) {
     this.x = x;
@@ -191,7 +186,6 @@ class Block {
     pop();
   }
 }
-
 class Mino {
   constructor(x, y, shape, rot = 0) {
     this.x = x;
@@ -244,7 +238,6 @@ class Mino {
     });
   }
 }
-
 class Field {
   constructor() {
     this.matrix = Array.from(Array(10), () => Array(40).fill(0));
@@ -288,7 +281,6 @@ class Field {
     }
   }
 }
-
 class Game {
   constructor() {
     this.nexts = this.randomGenerator();
@@ -314,7 +306,17 @@ class Game {
     }
   }
   getNexts(n = 5) {
-    //넥스트 그릴 때 this.nexts로부터 앞에서 n 개의 배열을 반환. 디폴트 = 5
+    let nxt = [];
+    for (let i = 0; i < n; i++) {
+      nxt.push(this.nexts[i]);
+    }
+    return nxt;
+  } //넥스트 그릴 때 this.nexts로부터 앞에서 n 개의 배열을 반환. 디폴트 = 5
+  drawNexts() {
+    // let nexts = this.getNexts();
+    // for (let i = 0; i < nexts.length; i++) {
+    //   //
+    // }
   }
   randomGenerator() {
     let minos = [0, 1, 2, 3, 4, 5, 6]; //Object.keys(mino).slice();
@@ -407,9 +409,9 @@ class Game {
     this.drawGhost();
     this.mino.draw();
     this.drawHold();
+    this.drawNexts();
   }
 }
-
 function setup() {
   createCanvas(windowWidth, windowHeight, WEBGL);
   game = new Game();
@@ -417,34 +419,17 @@ function setup() {
 function draw() {
   game.proc();
 }
-
 function keyPressed() {
-  if (keyCode === 82) {
-  } //r
-  if (keyCode === UP_ARROW) {
-    game.rotate = 1;
-  }
-  if (keyCode === DOWN_ARROW) {
-    game.move = [0, 1];
-  }
-  if (keyCode === LEFT_ARROW) {
-    game.move = [-1, 0];
-  }
-  if (keyCode === RIGHT_ARROW) {
-    game.move = [1, 0];
-  }
-  if (keyCode === 32) {
-    game.harddrop = true;
-  } //space
-  if (keyCode === 90) {
-    game.rotate = -1;
-  } //z
-  if (keyCode === 16) {
-    game.holdMino();
-  }
+  if (keyCode === 82) game = new Game(); //r
+  if (keyCode === UP_ARROW) game.rotate = 1;
+  if (keyCode === DOWN_ARROW) game.move = [0, 1];
+  if (keyCode === LEFT_ARROW) game.move = [-1, 0];
+  if (keyCode === RIGHT_ARROW) game.move = [1, 0];
+  if (keyCode === 32) game.harddrop = true; //space
+  if (keyCode === 90) game.rotate = -1; //z
+  if (keyCode === 16) game.holdMino();
   return false;
 }
-
 windowResized = function () {
   resizeCanvas(windowWidth, windowHeight);
 };
