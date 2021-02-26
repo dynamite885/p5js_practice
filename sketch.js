@@ -281,6 +281,22 @@ class Field {
     }
   }
 }
+
+class Next {
+  static nextCount = 0;
+  constructor(s) {
+    this.order = nextCount;
+    this.mino = this.setMino(s);
+    nextCount++;
+  }
+  setMino(s) {
+    return new Mino(14, 20 + 4 * this.order, s);
+  }
+  draw() {
+    this.mino.draw();
+  }
+}
+
 class Game {
   constructor() {
     this.nexts = this.randomGenerator();
@@ -305,14 +321,12 @@ class Game {
       this.nexts.push(...nexts);
     }
   }
-  getNexts(n = 5) {
-    let nxt = [];
-    for (let i = 0; i < n; i++) {
-      nxt.push(this.nexts[i]);
-    }
-    return nxt;
-  } //넥스트 그릴 때 this.nexts로부터 앞에서 n 개의 배열을 반환. 디폴트 = 5
-  drawNexts() {
+  setNexts(n, s) {
+    return new Mino(14, 21 + 4 * n, s, 0);
+  }
+  drawNexts(n = 5) {
+    let nexts = this.nexts.slice(undefined, n);
+    nexts.map((m, i) => {});
     // let nexts = this.getNexts();
     // for (let i = 0; i < nexts.length; i++) {
     //   //
